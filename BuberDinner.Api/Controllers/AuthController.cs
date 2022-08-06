@@ -3,6 +3,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using BuberDinner.Contracts.Authentication;
 using BuberDinner.Application.Services.Authentication;
+using BuberDinner.Application.Common.Errors;
 
 namespace BuberDinner.Api.Controllers;
 
@@ -20,19 +21,28 @@ public class AuthController : ControllerBase
   [HttpPost("register")]
   public IActionResult Register(RegisterRequest request)
   {
-    var authResult = _authService.Register(
+    OneOf<AuthResult, DuplicateEmailError> registerResult = _authService.Register(
       request.FirstName,
       request.LastName,
       request.Email,
       request.Password);
 
-    var response = new AuthenticationResponse(
+    if (registerResult.IsT0<AuthResult>())
+    {
+      var authResult = registerResult.AsT0;
+      var response = new AuthenticationResponse(
       authResult.User.Id,
       authResult.User.FirstName,
       authResult.User.LastName,
       authResult.User.Email,
       authResult.Token
     );
+    }
+    else
+    {
+      return BadRequest(registerResult.Value);
+    }
+    
     return Ok(response);
   }
 
