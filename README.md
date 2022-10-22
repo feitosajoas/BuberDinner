@@ -10,3 +10,4 @@ Pois assim vai evitar o erro em requisições de cadastro e login:
 Cannot create a 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', key length is zero.
 ```
 
+TODO: Implementar limitações de requisição nos endpoints
